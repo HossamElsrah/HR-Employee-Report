@@ -75,9 +75,5 @@ Optimized in BigQuery:
 3. **Visualize**: Connect Looker Studio to your BigQuery tables
 
 ---
-## 📄 License
-MIT License. See [LICENSE](LICENSE) for details.
-
----
 ## 👨‍💻 Connect  
 [Hossam Taha on LinkedIn](https://linkedin.com/in/hossam-taha-41b724288)
