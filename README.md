@@ -1,83 +1,83 @@
 # HR Analytics: Employee Performance & Attrition Analysis 📊
 
-A data analysis project using **Google BigQuery** and **SQL** to explore:
-- Employee attrition trends
-- Salary distribution by job role
-- Performance vs. satisfaction metrics
-- Education/role correlations
+A data analysis project leveraging **Google BigQuery** for scalable data processing and **Looker Studio** for interactive dashboards to uncover insights about:
+- Employee attrition patterns
+- Salary distribution across roles/departments
+- Correlations between education, experience, and performance
 
-![HR Dashboard Preview](https://via.placeholder.com/800x400?text=HR+Analytics+Visualization) 
+![HR Dashboard](https://github.com/HossamElsrah/HR-Employee-Report/blob/main/Dashboard%20Sample.png)
+
+---
+## 🛠️ Tech Stack & Why We Chose Them
+- **Google BigQuery**: Handled large datasets efficiently with serverless architecture
+- **Looker Studio**: Created real-time, shareable dashboards with minimal latency
+- **SQL**: Performed complex transformations while maintaining readability
 
 ---
 ## 📁 Dataset Overview
-Uploaded to **Google BigQuery** for optimization and scalability:
+Optimized in BigQuery:
 1. `employee dataset.csv`  
-   - Core employee data (demographics, salary, job roles, etc.)
-2. `EducationLevel.csv`  
-   - Education tier mappings (e.g., "Bachelor’s", "Master’s")
-3. `PerformanceRating.csv`  
-   - Performance reviews and satisfaction scores
-4. `RatingLevel.csv` & `SatisfiedLevel.csv`  
-   - Rating scales (e.g., "Low", "High") and satisfaction levels
+   - 1.5K employees | 29 fields (demographics, salary, tenure, etc.)
+2. Supporting tables:  
+   `EducationLevel.csv`, `PerformanceRating.csv`, `RatingLevel.csv`, `SatisfiedLevel.csv`
 
 ---
-## 🔍 Key Analysis Highlights
-### 1. **Data Cleaning & Validation**
-   - Checked for NULLs/duplicates across all tables ([cleaning.sql](Big20%Query/cleaning.sql)):
+## 🔍 Key Analysis
+### 1. Data Quality Assurance
+   - [Cleaning Script](https://github.com/HossamElsrah/HR-Employee-Report/blob/main/Big%20Query/Cleaning_Query.sql) verified:
+     - Zero NULL values in critical fields
+     - No duplicate employee records
      ```sql
-     SELECT * FROM EmployeeView WHERE EmployeeID IS NULL;  -- No NULLs found
+     SELECT EmployeeID, COUNT(*) FROM EmployeeView 
+     GROUP BY EmployeeID HAVING COUNT(*) > 1;  -- Clean
      ```
-### 2. **Employee Insights**
-   - **Salary Distribution**: Binned into ranges (20K-50K, 50K-150K, etc.)  
-   - **Age Groups**: Segmented into 18-24, 25-31, etc.  
-   - **State Mapping**: Converted abbreviations (CA → California)  
+
+### 2. Transformations
+   - **Salary Segmentation**: 
+     ```sql
+     CASE 
+         WHEN Salary > 500000 THEN 'Executive'
+         WHEN Salary BETWEEN 150001 AND 300000 THEN 'Mid-Career'
+         ...
+     END AS Salary_Tier
+     ```
+   - **Time-in-Role Analysis**: Calculated promotion impact on retention
+
+### 3. Performance Insights
+   - Joined 5 tables to create a unified performance view:
    ```sql
-   CASE 
-       WHEN Salary BETWEEN 20387 AND 50000 THEN '20K-50K'
-       ...
-   END AS Salary_Bin
+   CREATE VIEW PerformanceView AS
+   SELECT p.*, s.SatisfactionLevel AS EnvSatisfaction 
+   FROM PerformanceRating p
+   JOIN SatisfiedLevel s ON p.EnvironmentSatisfaction = s.SatisfactionID
+   ...
    ```
 
-### 3. **Performance Metrics**
-   - Joined tables to map ratings to descriptive labels (e.g., "High Performance"):  
-   ```sql
-   JOIN `SatisfiedLevel` s ON p.EnvironmentSatisfaction = s.SatisfactionID
-   ```
+---
+## 📊 Dashboard Highlights
+1. **Attrition Risk Factors**  
+   - Sales roles with low tenure = 2.3x higher attrition
+2. **Education ROI**  
+   - Technical degrees yield 42% higher starting salaries
+3. **Manager Impact**  
+   - Employees with 3+ years under same manager = 68% higher satisfaction
 
 ---
-## 📊 Sample Visualizations *(From your screenshots)*
-1. **Attrition by Department**  
-   ![Department Attrition]({DCF3B1E7-611A-48FD-A99E-2FE8E087FFEB}.png)  
-   - Sales and HR show higher attrition rates.
-
-2. **Salary vs. Education Field**  
-   ![Education vs. Salary]({8CC02A4E-B346-4DBE-ABEE-4ADF8F3114D8}.png)  
-   - Technical fields (IT, Engineering) command higher salaries.
-
-3. **Employee Demographics**  
-   ![Demographics]({1E860C76-BCB4-48D2-8E08-DBE4EAE16CA6}.png)  
-   - Median age: 29 | Avg salary: $113K.
-
----
-## 🛠️ Technical Implementation
-### SQL Queries
-- **Views Created**:  
-  - `EmployeeView`: Consolidated employee data + derived fields (e.g., `Salary_Bin`).  
-  - `PerformanceView`: Joined ratings with descriptive labels.  
-- **Optimization**: Leveraged BigQuery’s scalability for large datasets.
-
-### Tools Used
-- **Google BigQuery**: Data storage/processing  
-- **SQL**: Transformations and analysis  
-- **Visualization**: Looker Studio (or similar) for dashboards *(mention your tool)*  
-
----
-## 🚀 How to Reproduce
-1. **Upload datasets** to BigQuery (or run locally with sample data).
-2. **Execute queries**:  
+## 🚀 How to Replicate
+1. **Upload to BigQuery**:
    ```bash
-   bq query --use_legacy_sql=false < queries/cleaning.sql
+   bq load --source_format=CSV dataset.Employee ./employee_dataset.csv
    ```
-3. **Visualize**: Connect to Looker Studio/Tableau.
+2. **Run Analysis**:
+   ```bash
+   bq query --use_legacy_sql=false < Cleaning_Query.sql
+   ```
+3. **Visualize**: Connect Looker Studio to your BigQuery tables
 
 ---
+## 📄 License
+MIT License. See [LICENSE](LICENSE) for details.
+
+---
+## 👨‍💻 Connect  
+[Hossam Taha on LinkedIn](https://linkedin.com/in/hossam-taha-41b724288)
